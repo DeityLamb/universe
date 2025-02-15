@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY apps/${APP} ./apps/${APP}
-COPY drizzle.config.ts tsconfig.json nest-cli.json ./
+COPY tsconfig.json nest-cli.json ./
 
 RUN npm run build ${APP}
 
