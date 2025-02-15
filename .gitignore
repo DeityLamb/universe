@@ -1,2 +1,5 @@
 /psql
 .idea
+node_modules
+dist
+.env

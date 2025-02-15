@@ -1,15 +1,58 @@
 services:
-  psql:
-    container_name: psql
-    image: postgres:16
+
+  universe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP: universe
+    container_name: universe
     environment:
-      POSTGRES_DB: "legaltech_test"
+      DATABASE_URL: postgres://postgres:postgres@psql:5432/postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbit:5672
+      PORT: 3000
+    ports:
+      - 3000:3000
+    depends_on:
+      psql:
+        condition: service_healthy
+        restart: true
+      rabbit:
+        condition: service_started
+      prometheus:
+        condition: service_started
+
+  notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP: notifications
+    container_name: notifications
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbit:5672
+      PORT: 3001
+    ports:
+      - 3001:3001
+    depends_on:
+      - rabbit
+      - universe
+
+  psql:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: "postgres"
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "root"
+      POSTGRES_PASSWORD: "postgres"
+      PGDATA: /tmp/pgdata
     ports:
       - "5432:5432"
-    volumes:
-      - ./psql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   prometheus:
     image: prom/prometheus
@@ -18,21 +61,11 @@ services:
     ports:
       - 9090:9090
 
-  localstack:
-    container_name: localstack
-    image: localstack/localstack:latest
+  rabbit:
+    image: rabbitmq:3-alpine
     ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=sqs,s3
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - AWS_DEFAULT_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-    volumes:
-      - "./init-localstack.sh:/etc/localstack/init/ready.d/init-localstack.sh"
-      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - 5672:5672
+      - 15672:15672
 
 volumes:
   psql:
