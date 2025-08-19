@@ -7,9 +7,8 @@
 
 ### Frontend
 
-- React
-- React Router, Vite
-- MUI, Axios, Tailwind CSS
+- React React Router
+- Vite, MUI, Axios
 
 ```bash
 docker compose up
