@@ -1,0 +1,36 @@
+{
+  "name": "universe",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "m:gen": "drizzle-kit generate --name",
+    "m:up": "drizzle-kit migrate",
+    "psql": "docker-compose exec postgres psql -U postgresql -d postgresql"
+  },
+  "dependencies": {
+    "-": "^0.0.1",
+    "@hono/node-server": "^1.19.0",
+    "@octokit/rest": "^22.0.0",
+    "@scalar/hono-api-reference": "^0.9.13",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.4",
+    "drizzle-zod": "^0.8.3",
+    "hono": "^4.9.2",
+    "hono-openapi": "^0.4.8",
+    "nodemailer": "^7.0.5",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76",
+    "zod-openapi": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/nodemailer": "^7.0.0",
+    "@types/pg": "^8.15.5",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.4",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,37 @@
+services:
+  fe:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - 3001:3001
+    depends_on:
+      - be
+    environment:
+      PORT: 3001
+
+  be:
+    build: .
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgresql:postgresql@postgres:5432/postgresql
+      PORT: 3000
+
+  postgres:
+    image: postgres:14.5-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: postgresql
+      POSTGRES_DB: postgresql
+    ports:
+      - 5432:5432
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
